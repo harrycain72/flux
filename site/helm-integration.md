@@ -23,7 +23,7 @@ resource. The schema for these resources is given in [the custom
 resource definition](../deploy-helm/flux-helm-release-crd.yaml). They
 look like this:
 
-```
+```yaml
 ---
 apiVersion: flux.weave.works/v1beta1
 kind: FluxHelmRelease
@@ -62,10 +62,10 @@ into the structure of the resource.
 You can refer to a chart from a _git_ repo, rather than a chart repo,
 with a `chart:` section like this:
 
-```
+```yaml
 spec:
   chart:
-    gitRepository: git@github.com/weaveworks/flux
+    gitRepository: git@github.com:weaveworks/flux
     ref: master
     path: charts/flux
 ```
@@ -126,42 +126,55 @@ Flux, the same way you can with Deployments and so on.
 
 Flux interprets certain commonly used structures in the `values`
 section of a `FluxHelmRelease` as referring to images. The following
-are understood:
-x
-```
-image: repo/image:version
+are understood (showing just the `values` section):
+
+```yaml
+values:
+  image: repo/image:version
 ```
 
-```
-image: repo/image
-tag: version
-```
-
-```
-image:
-  repository: repo/image
+```yaml
+values:
+  image: repo/image
   tag: version
 ```
 
-These can appear at the top level (immediately under `values:`), or in
-a subsection (under a key, itself under `values:`):
-
-```
+```yaml
 values:
-  image: repo/image:version
+  image:
+    repository: repo/image
+    tag: version
+```
+
+These can appear at the top level (immediately under `values:`), or in
+a subsection (under a key, itself under `values:`). Other values
+may be mixed in arbitrarily. Here's an example of a values section
+that specifies two images, along with some other configuration:
+
+```yaml
+values:
+  persistent: true
+
+  # image that will be labeled "chart-image"
+  image: repo/image1:version
 
   subsystem:
+    # image that will be labeled "subsystem"
     image:
-      repository: repo/image
+      repository: repo/image2
       tag: version
+      imagePullPolicy: IfNotPresent
+    port: 4040
 ```
 
+### Using annotations to control updates to FluxHelmRelease resources
+
 You can use the [same annotations](./using.md#using-annotations) in
-the `FluxHelmRelease` as you would for a Deployment, to control
-updates and automation. For the purpose of specifying filters, the
-container name is either `chart-image` (if at the top level), or the
-key under which the image is given (e.g., `"subsystem"` from the
-example above).
+the `FluxHelmRelease` as you would for a Deployment or other workload,
+to control updates and automation. For the purpose of specifying
+filters, the container name is either `chart-image` (if at the top
+level), or the key under which the image is given (e.g., `"subsystem"`
+from the example above).
 
 -------------
 
