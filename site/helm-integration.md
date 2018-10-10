@@ -7,7 +7,7 @@ menu_order: 90
 
 You can release charts to your cluster via "GitOps", by combining Flux
 and the Flux Helm Operator (also in
-[weaveworks/flux](https://github.com/weaveworks/flux).
+[weaveworks/flux](https://github.com/weaveworks/flux)).
 
 The essential mechanism is this: the declaration of a Helm release is
 represented by a custom resource, specifying the chart and its
