@@ -191,11 +191,10 @@ func (d *Daemon) doSync(logger log.Logger) (retErr error) {
 		return errors.Wrap(err, "loading resources from repo")
 	}
 
-	likelyErrors := len(d.syncErrors.errs) > 0
 	syncErrors := make(map[flux.ResourceID]error)
 	var resourceErrors []event.ResourceError
 	// TODO supply deletes argument from somewhere (command-line?)
-	if err := fluxsync.Sync(logger, d.Manifests, allResources, d.Cluster, false, likelyErrors); err != nil {
+	if err := fluxsync.Sync(logger, d.Manifests, allResources, d.Cluster, false, d.syncErrors.errs); err != nil {
 		logger.Log("err", err)
 		switch syncerr := err.(type) {
 		case cluster.SyncError:
