@@ -62,7 +62,6 @@ func (m *Mirrors) Mirror(name string, remote Remote, options ...Option) bool {
 	_, ok := m.repos[name]
 	if !ok {
 		repo := NewRepo(remote, options...)
-		println("[DEBUG] made a repo")
 		stop := make(chan struct{})
 		mir := mirroringState{stop: stop, repo: repo}
 		m.repos[name] = mir
@@ -78,8 +77,7 @@ func (m *Mirrors) Mirror(name string, remote Remote, options ...Option) bool {
 			}
 		}()
 
-		m.wg.Add(1) // the wait group only waits for the refresh loop; the forwarding loop will exit when we close `stop`
-		println("[DEBUG] about to start")
+		m.wg.Add(1)               // the wait group only waits for the refresh loop; the forwarding loop will exit when we close `stop`
 		go repo.Start(stop, m.wg) // TODO(michael) is it safe to use the wait group dynamically like this?
 	}
 	return ok
