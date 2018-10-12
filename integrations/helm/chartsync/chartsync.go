@@ -227,12 +227,9 @@ func mirrorName(chartSource *fhr.GitChartSource) string {
 // if necessary
 func (chs *ChartChangeSync) maybeMirror(fhr fhr.FluxHelmRelease) {
 	chartSource := fhr.Spec.ChartSource.GitChartSource
-	println("[DEBUG] maybeMirror", chartSource.GitURL)
 	if chartSource != nil {
 		if ok := chs.mirrors.Mirror(mirrorName(chartSource), git.Remote{chartSource.GitURL}, git.ReadOnly); !ok {
 			chs.logger.Log("info", "started mirroring repo", "repo", chartSource.GitURL)
-		} else {
-			println("[DEBUG] already mirroring", chartSource.GitURL)
 		}
 	}
 }
@@ -248,7 +245,6 @@ func (chs *ChartChangeSync) ReconcileReleaseDef(fhr fhr.FluxHelmRelease) {
 // FluxHelmRelease resource, and either installs, upgrades, or does
 // nothing, depending on the state (or absence) of the release.
 func (chs *ChartChangeSync) reconcileReleaseDef(fhr fhr.FluxHelmRelease) {
-	println("[DEBUG] reconcileReleaseDef", fhr.Name)
 	releaseName := release.GetReleaseName(fhr)
 
 	// There's no exact way in the Helm API to test whether a release
@@ -261,7 +257,6 @@ func (chs *ChartChangeSync) reconcileReleaseDef(fhr fhr.FluxHelmRelease) {
 
 	cloneDir := ""
 	if fhr.Spec.ChartSource.GitChartSource != nil {
-		println("[DEBUG] checking for clone", releaseName)
 		// We need to hold the lock until after we're done releasing
 		// the chart, so that the clone doesn't get swapped out from
 		// under us. TODO(michael) consider having a lock per clone.
@@ -288,8 +283,6 @@ func (chs *ChartChangeSync) reconcileReleaseDef(fhr fhr.FluxHelmRelease) {
 		}
 		cloneDir = chartClone.export.Dir()
 	}
-
-	println("[DEBUG] cloneDir", cloneDir, "for", releaseName)
 
 	if rel == nil {
 		_, err := chs.release.Install(cloneDir, releaseName, fhr, release.InstallAction, opts)
