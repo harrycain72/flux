@@ -80,7 +80,7 @@ spec:
         - --git-url={{ $gitURL }}
         - --git-branch={{ $gitBranch }}
         - --git-poll-interval={{ $gitPollInterval }}
-        - --git-timeout={{ $gitTimeout }}
+
         - --git-charts-path={{ .Values.helmOperator.git.chartsPath }}
         - --charts-sync-interval={{ .Values.helmOperator.chartsSyncInterval }}
         - --charts-sync-timeout={{ .Values.helmOperator.chartsSyncTimeout }}

@@ -15,7 +15,7 @@ service:
   port: 3030
 
 helmOperator:
-  create: false
+  create: true
   createCRD: true
   repository: quay.io/weaveworks/helm-operator
   tag: 0.2.1
@@ -37,7 +37,7 @@ helmOperator:
     caContent: ""
   # Override Flux git settings
   git:
-    url: ""
+    url: "https://atc.bmwgroup.net/bitbucket/scm/mgwz/hackingfriday_gitpos_helm.git"
     branch: ""
     chartsPath: "charts"
     pollInterval: ""
