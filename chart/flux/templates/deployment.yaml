@@ -15,6 +15,10 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      {{- if .Values.prometheus.enabled }}
+      annotations:
+        prometheus.io.scrape: "true"
+      {{- end }}
       labels:
         app: {{ template "flux.name" . }}
         release: {{ .Release.Name }}
@@ -63,6 +67,9 @@ spec:
           env:
           - name: KUBECONFIG
             value: /root/.kubectl/config
+          {{- if .Values.extraEnvs }}
+{{ toYaml .Values.extraEnvs | indent 10 }}
+          {{- end }}
           args:
           - --ssh-keygen-dir=/var/fluxd/keygen
           - --k8s-secret-name={{ template "flux.fullname" . }}-git-deploy
@@ -80,13 +87,15 @@ spec:
           {{- if .Values.git.label }}
           - --git-label={{ .Values.git.label }}
           {{- end }}
-          - --registry-cache-expiry={{ .Values.registry.cacheExpiry }}
           - --registry-poll-interval={{ .Values.registry.pollInterval }}
           - --registry-rps={{ .Values.registry.rps }}
           - --registry-burst={{ .Values.registry.burst }}
           - --registry-trace={{ .Values.registry.trace }}
           {{- if .Values.registry.insecureHosts }}
           - --registry-insecure-host={{ .Values.registry.insecureHosts }}
+          {{- end }}
+          {{- if .Values.registry.cacheExpiry }}
+          - --registry-cache-expiry={{ .Values.registry.cacheExpiry }}
           {{- end }}
           {{- if .Values.token }}
           - --connect=wss://cloud.weave.works/api/flux

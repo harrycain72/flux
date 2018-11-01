@@ -8,6 +8,17 @@ import (
 	"github.com/weaveworks/flux/ssh"
 )
 
+// Constants for workload ready status. These are defined here so that
+// no-one has to drag in Kubernetes dependencies to be able to use
+// them.
+const (
+	StatusUnknown  = "unknown"
+	StatusError    = "error"
+	StatusReady    = "ready"
+	StatusUpdating = "updating"
+	StatusStarted  = "started"
+)
+
 // The things we can get from the running cluster. These used to form
 // the remote.Platform interface; but now we do more in the daemon so they
 // are distinct interfaces.
@@ -59,6 +70,9 @@ type Controller struct {
 	Antecedent flux.ResourceID
 	Labels     map[string]string
 	Rollout    RolloutStatus
+	// Errors during the recurring sync from the Git repository to the
+	// cluster will surface here.
+	SyncError  error
 
 	Containers ContainersOrExcuse
 }

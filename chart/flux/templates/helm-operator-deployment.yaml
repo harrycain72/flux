@@ -20,6 +20,10 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      {{- if .Values.prometheus.enabled }}
+      annotations:
+        prometheus.io.scrape: "true"
+      {{- end }}
       labels:
         app: {{ template "flux.name" . }}-helm-operator
         release: {{ .Release.Name }}
@@ -84,6 +88,7 @@ spec:
         - --git-charts-path={{ .Values.helmOperator.git.chartsPath }}
         - --charts-sync-interval={{ .Values.helmOperator.chartsSyncInterval }}
         - --charts-sync-timeout={{ .Values.helmOperator.chartsSyncTimeout }}
+        - --update-chart-deps={{ .Values.helmOperator.updateChartDeps }}
         - --log-release-diffs={{ .Values.helmOperator.logReleaseDiffs }}
         - --tiller-namespace={{ .Values.helmOperator.tillerNamespace }}
         {{- if .Values.helmOperator.tls.enable }}
@@ -95,4 +100,22 @@ spec:
         - --tiller-tls-ca-cert-path=/etc/fluxd/helm-ca/ca.crt
         {{- end }}
         {{- end }}
+      {{- if .Values.helmOperator.extraEnvs }}
+        env:
+{{ toYaml .Values.helmOperator.extraEnvs | indent 8 }}
+      {{- end }}
+        resources:
+{{ toYaml .Values.helmOperator.resources | indent 10 }}
+      {{- with .Values.helmOperator.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.helmOperator.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+      {{- end }}
+      {{- with .Values.helmOperator.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+      {{- end }}
 {{- end -}}
